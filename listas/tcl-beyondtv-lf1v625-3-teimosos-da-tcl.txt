@@ -1,0 +1,16 @@
+# TCL BeyondTV · Android 9 · firmware V8-R851T02-LF1V625 · grupo 3: os teimosos
+# Parte da lista completa listas/tcl-beyondtv-lf1v625.txt (lá estão a lista 'Não desligar nunca' e os motivos).
+# Rode um grupo por vez: -Simular, desligar, reiniciar a TV, testar (antena, HDMI, controle, voz, os apps da casa).
+#
+# AVISO: o com.tcl.appstatecontroller (app de sistema, com a permissão INSTALL_PACKAGES) desfaz
+# o que o adb faz com estes 4: "pm uninstall -k --user 0" e "pm disable-user" voltam sozinhos
+# a cada boot. E o adb de um aparelho comum não consegue desligar o BootReceiver dele
+# (dá SecurityException). Por isso as linhas abaixo só valem até a TV reiniciar.
+# O que ajuda é a faxina do app da tela inicial deste projeto, que pede pra fechar esses 4
+# no boot, 60 s depois e toda vez que a tela volta. Na TV testada, 2 ficaram fechados e a TCL
+# manteve a Alexa e o MagiConnect rodando (o Android não deixa um app comum fechar esses dois).
+# Sem o app, o jeito é aceitar que eles voltam.
+com.tcl.smartalexa                          # Alexa da TCL
+com.tcl.MultiScreenInteraction_TV           # MagiConnect / T-Cast (o Chromecast fica)
+com.tcl.notereminder                        # lembretes da TCL
+com.tcl.tv.tclhome_master                   # TCL Channel (não testado nas listas de referência)

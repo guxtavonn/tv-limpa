@@ -1,0 +1,22 @@
+# Ferramentas e material locais (nada pessoal no repositorio)
+ferramentas/
+backup/
+gravacoes/
+medidas/
+.superpowers/
+local.properties
+
+# Build e IDE
+build/
+.gradle/
+.idea/
+*.apk
+
+# Material de referencia e arquivos gerados que nao sobem
+referencia-cleanyourtv/
+listas/grupo*
+listas/log-*
+prototipo/*.png
+prototipo/banners.json
+prototipo/tela-v*.html
+release/

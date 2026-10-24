@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tela inicial · protótipo</title>
+<style>
+  :root{--bg:#070707;--txt:#fafafa;--sub:#a1a1aa;--fraco:#52525b;--linha:rgba(255,255,255,.08);--mola:cubic-bezier(.2,.8,.2,1)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#000;overflow:hidden}
+  body{display:flex;align-items:center;justify-content:center;font-family:"Inter","SF Pro Display","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  #palco{width:1920px;height:1080px;position:relative;background:var(--bg);color:var(--txt);overflow:hidden;transform-origin:center;flex:none}
+
+  .brilho{position:absolute;inset:-10%;opacity:0;transition:opacity .9s cubic-bezier(.2,.7,.2,1)}
+  .brilho.on{opacity:1}
+  .vinheta{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,7,7,0) 0%,rgba(7,7,7,.35) 55%,rgba(7,7,7,.92) 100%)}
+
+  .hora{position:absolute;top:64px;right:96px;text-align:right;z-index:4}
+  .hora b{display:block;font-size:44px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .hora span{font-size:22px;color:var(--sub)}
+
+  /* camadas de tela: início e grade deslizam entre si */
+  .tela{position:absolute;inset:0;transition:opacity .45s var(--mola), transform .55s var(--mola)}
+  .tela.fora{opacity:0;pointer-events:none}
+  #inicio.fora{transform:scale(.97)}
+  #grade.fora{transform:translateY(40px)}
+
+  .titulo{position:absolute;left:120px;top:330px;height:200px;width:1200px}
+  .nome{position:absolute;left:0;top:0;font-size:120px;font-weight:700;letter-spacing:-.045em;line-height:1;white-space:nowrap;
+        transition:opacity .45s ease, transform .55s var(--mola)}
+  .nome.sai{opacity:0;transform:translateX(-24px)}
+  .nome.entra{opacity:0;transform:translateX(24px)}
+  .dica{position:absolute;left:4px;top:150px;font-size:26px;color:var(--sub);transition:opacity .4s}
+
+  .fileira{position:absolute;left:120px;right:120px;top:640px;display:flex;gap:40px}
+  .app{flex:1;aspect-ratio:16/9;border-radius:18px;position:relative;cursor:pointer;
+       transition:transform .38s var(--mola), box-shadow .38s, filter .38s;filter:brightness(.62) saturate(.85)}
+  .app img,.app .gen{width:100%;height:100%;object-fit:cover;border-radius:18px;display:block}
+  .app::after{content:"";position:absolute;inset:0;border-radius:18px;
+       background:linear-gradient(115deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,0) 38%);opacity:0;transition:opacity .38s}
+  .app.foco{transform:scale(1.14) translateY(-10px);filter:none;z-index:3;
+       box-shadow:0 34px 60px -12px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.14)}
+  .app.foco::after{opacity:1}
+  .app.segurando{transform:scale(1.06) translateY(-4px)}
+  .gen{background:#18181b;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#e4e4e7;font-size:22px;font-weight:600}
+  .gen svg{width:56px;height:56px;stroke:currentColor;fill:none;stroke-width:1.6}
+
+  .atalhos{position:absolute;left:120px;top:900px;display:flex;gap:20px}
+  .atalho{height:64px;padding:0 30px;border-radius:14px;display:flex;align-items:center;gap:14px;
+          font-size:24px;font-weight:500;color:var(--sub);background:rgba(255,255,255,.04);
+          box-shadow:inset 0 0 0 1px var(--linha);cursor:pointer;transition:transform .3s var(--mola),background .3s,color .3s}
+  .atalho svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .atalho.foco{background:var(--txt);color:#09090b;transform:scale(1.08);box-shadow:0 18px 36px -10px rgba(0,0,0,.8)}
+
+  /* grade de todos os apps */
+  #grade h1{position:absolute;left:120px;top:96px;font-size:64px;font-weight:700;letter-spacing:-.035em}
+  #grade .sub{position:absolute;left:122px;top:180px;font-size:24px;color:var(--sub)}
+  .grade{position:absolute;left:120px;right:120px;top:280px;display:grid;grid-template-columns:repeat(5,1fr);gap:56px 40px}
+  .grade .app{flex:none}
+  .grade .rot{position:absolute;left:0;right:0;top:calc(100% + 14px);text-align:center;font-size:22px;color:var(--sub);opacity:0;transition:opacity .3s}
+  .grade .app.foco .rot{opacity:1;color:var(--txt)}
+
+  /* modal de organizar */
+  .fundo-modal{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+               opacity:0;pointer-events:none;transition:opacity .35s;z-index:20}
+  .fundo-modal.on{opacity:1;pointer-events:auto}
+  .modal{position:absolute;left:50%;top:50%;width:620px;transform:translate(-50%,-46%) scale(.96);opacity:0;
+         background:rgba(24,24,27,.92);border-radius:28px;padding:40px 28px 28px;box-shadow:0 40px 80px -20px rgba(0,0,0,.9),inset 0 0 0 1px rgba(255,255,255,.08);
+         transition:transform .45s var(--mola),opacity .3s;z-index:21}
+  .fundo-modal.on .modal{transform:translate(-50%,-50%) scale(1);opacity:1}
+  .modal .cab{display:flex;align-items:center;gap:22px;padding:0 12px 28px}
+  .modal .cab img,.modal .cab .gen{width:160px;height:90px;border-radius:12px;object-fit:cover}
+  .modal .cab .gen{font-size:16px;gap:4px}.modal .cab .gen svg{width:30px;height:30px}
+  .modal .cab b{font-size:34px;letter-spacing:-.02em}
+  .opcao{height:72px;border-radius:16px;display:flex;align-items:center;gap:18px;padding:0 24px;font-size:26px;color:#d4d4d8;transition:background .25s,color .25s,transform .3s var(--mola)}
+  .opcao svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .opcao.foco{background:var(--txt);color:#09090b;transform:scale(1.02)}
+  .opcao.perigo{color:#fca5a5}.opcao.perigo.foco{background:#fafafa;color:#b91c1c}
+
+  .abrindo{position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+           opacity:0;pointer-events:none;transition:opacity .35s;z-index:30}
+  .abrindo.on{opacity:1}
+  .abrindo img,.abrindo .gen{width:320px;height:180px;border-radius:22px;object-fit:cover;box-shadow:0 30px 70px -20px rgba(0,0,0,.9)}
+  .abrindo span{font-size:26px;color:var(--sub)}
+  .pontos i{display:inline-block;width:8px;height:8px;margin:0 5px;border-radius:50%;background:#71717a;animation:pulsa 1s infinite}
+  .pontos i:nth-child(2){animation-delay:.15s}.pontos i:nth-child(3){animation-delay:.3s}
+  @keyframes pulsa{0%,100%{opacity:.25}50%{opacity:1}}
+
+  .controle{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);font:13px system-ui;color:#71717a;white-space:nowrap;
+            background:#111;padding:6px 14px;border-radius:999px;box-shadow:inset 0 0 0 1px #222;z-index:9}
+  .controle kbd{font:inherit;color:#d4d4d8;background:#1c1c1f;padding:1px 6px;border-radius:5px;margin:0 2px}
+</style>
+</head>
+<body>
+<div id="palco">
+  <div class="brilho" id="b0"></div><div class="brilho" id="b1"></div>
+  <div class="vinheta"></div>
+  <div class="hora"><b id="h">--:--</b><span id="d"></span></div>
+
+  <section class="tela" id="inicio">
+    <div class="titulo" id="titulo"><div class="dica" id="dica">aperte OK pra abrir · segure OK pra organizar</div></div>
+    <div class="fileira" id="fileira"></div>
+    <div class="atalhos" id="atalhos"></div>
+  </section>
+
+  <section class="tela fora" id="grade">
+    <h1>Todos os apps</h1>
+    <div class="sub">segure OK num app pra pôr na tela inicial · voltar fecha</div>
+    <div class="grade" id="gradeApps"></div>
+  </section>
+
+  <div class="fundo-modal" id="fundoModal"><div class="modal" id="modal"></div></div>
+  <div class="abrindo" id="abrindo"></div>
+</div>
+<div class="controle">clique na tela · <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> controle · <kbd>Enter</kbd> OK · <b>segure</b> <kbd>Enter</kbd> organizar · <kbd>Esc</kbd> voltar</div>
+
+<script>
+const ICONE = {
+  loja:'<svg viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></svg>',
+  tv:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+  hdmi:'<svg viewBox="0 0 24 24"><path d="M4 8h16v6l-3 3H7l-3-3z"/><path d="M8 11h8"/></svg>',
+  apps:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+  config:'<svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',
+  esq:'<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',
+  dir:'<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
+  tira:'<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>',
+  poe:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  x:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+};
+// todos os apps instalados (o real vem do Android); img = banner, senão um cartão genérico
+const TODOS = {
+  netflix:{nome:"Netflix",img:"__NETFLIX__",cor:"229,9,20"},
+  prime:{nome:"Prime Video",img:"__PRIME__",cor:"0,120,255"},
+  youtube:{nome:"YouTube",img:"__YOUTUBE__",cor:"255,0,0"},
+  globoplay:{nome:"Globoplay",img:"__GLOBOPLAY__",cor:"255,20,80"},
+  disney:{nome:"Disney+",img:"__DISNEY__",cor:"20,140,170"},
+  tv:{nome:"TV aberta",img:"__TV__",cor:"230,30,30"},
+  loja:{nome:"Play Store",icone:"loja",cor:"120,200,120"},
+};
+let FILEIRA = ["netflix","prime","youtube","globoplay","disney"];
+const ATALHOS = [{nome:"TV aberta",icone:"tv"},{nome:"HDMI",icone:"hdmi"},{nome:"Apps",icone:"apps"},{nome:"Configurações",icone:"config"}];
+
+const $=id=>document.getElementById(id);
+const capa=(a)=>a.img?`<img src="${a.img}" alt="${a.nome}">`:`<div class="gen">${ICONE[a.icone]}<span>${a.nome}</span></div>`;
+
+let modo="inicio", linha=0, col=0, gi=0, mi=0, opcoes=[], alvo=null;
+
+function montaInicio(){
+  $("fileira").innerHTML=FILEIRA.map((k,i)=>`<div class="app" data-i="${i}">${capa(TODOS[k])}</div>`).join("");
+  $("atalhos").innerHTML=ATALHOS.map((a,i)=>`<div class="atalho" data-i="${i}">${ICONE[a.icone]}${a.nome}</div>`).join("");
+  [...document.querySelectorAll("#fileira .app")].forEach((e,i)=>{e.onmouseenter=()=>{if(modo!=="inicio")return;linha=0;col=i;desenha()};e.onclick=ok});
+  [...document.querySelectorAll(".atalho")].forEach((e,i)=>{e.onmouseenter=()=>{if(modo!=="inicio")return;linha=1;col=i;desenha()};e.onclick=ok});
+}
+function montaGrade(){
+  const ks=Object.keys(TODOS);
+  $("gradeApps").innerHTML=ks.map((k,i)=>`<div class="app" data-k="${k}">${capa(TODOS[k])}<div class="rot">${TODOS[k].nome}${FILEIRA.includes(k)?" · na tela inicial":""}</div></div>`).join("");
+  [...document.querySelectorAll("#gradeApps .app")].forEach((e,i)=>{e.onmouseenter=()=>{if(modo!=="grade")return;gi=i;desenha()};e.onclick=ok});
+}
+
+// brilho e nome (cada nome novo é uma camada nova; as antigas saem sozinhas)
+let brilhoAtual=0,nomeVisivel="";
+function brilho(cor){const p=1-brilhoAtual,el=$("b"+p);
+  el.style.background=`radial-gradient(55% 60% at 22% 28%, rgba(${cor},.42), rgba(${cor},.10) 45%, transparent 72%),radial-gradient(40% 45% at 85% 15%, rgba(${cor},.14), transparent 70%)`;
+  el.classList.add("on");$("b"+brilhoAtual).classList.remove("on");brilhoAtual=p}
+function nome(txt){if(txt===nomeVisivel)return;nomeVisivel=txt;const c=$("titulo");
+  c.querySelectorAll(".nome:not(.sai)").forEach(v=>{v.classList.add("sai");setTimeout(()=>v.remove(),600)});
+  const n=document.createElement("div");n.className="nome entra";n.textContent=txt;c.insertBefore(n,$("dica"));n.getBoundingClientRect();n.classList.remove("entra")}
+
+function desenha(){
+  $("inicio").classList.toggle("fora",modo==="grade"||(modo==="modal"&&alvo?.de==="grade"));
+  $("grade").classList.toggle("fora",!(modo==="grade"||(modo==="modal"&&alvo?.de==="grade")));
+  document.querySelectorAll("#fileira .app").forEach((e,i)=>e.classList.toggle("foco",linha===0&&i===col));
+  document.querySelectorAll(".atalho").forEach((e,i)=>e.classList.toggle("foco",linha===1&&i===col));
+  document.querySelectorAll("#gradeApps .app").forEach((e,i)=>e.classList.toggle("foco",i===gi));
+  document.querySelectorAll(".opcao").forEach((e,i)=>e.classList.toggle("foco",i===mi));
+  if(modo==="inicio"){
+    if(linha===0){const a=TODOS[FILEIRA[col]];nome(a.nome);brilho(a.cor);$("dica").style.opacity=1}
+    else{nome(ATALHOS[col].nome);brilho("255,255,255");$("dica").style.opacity=0}
+  } else if(modo==="grade"){brilho(TODOS[Object.keys(TODOS)[gi]].cor)}
+}
+
+function abre(a){const el=$("abrindo");el.innerHTML=`${a.img?`<img src="${a.img}">`:`<div class="gen">${ICONE[a.icone||"apps"]}<span>${a.nome}</span></div>`}<span>abrindo ${a.nome}</span><div class="pontos"><i></i><i></i><i></i></div>`;
+  el.classList.add("on");setTimeout(()=>el.classList.remove("on"),1600)}
+
+function ok(){
+  if(modo==="inicio"){
+    if(linha===0) return abre(TODOS[FILEIRA[col]]);
+    const a=ATALHOS[col];
+    if(a.nome==="Apps"){modo="grade";gi=0;montaGrade();return desenha()}
+    return abre({nome:a.nome,icone:a.icone});
+  }
+  if(modo==="grade") return abre(TODOS[Object.keys(TODOS)[gi]]);
+  if(modo==="modal") return opcoes[mi].faz();
+}
+function segura(){
+  if(modo==="inicio"&&linha===0){const k=FILEIRA[col];alvo={k,de:"inicio"};
+    opcoes=[
+      {txt:"Mover pra esquerda",ic:"esq",ok:col>0,faz:()=>{FILEIRA.splice(col,1);FILEIRA.splice(col-1,0,k);col--;fechaModal(true)}},
+      {txt:"Mover pra direita",ic:"dir",ok:col<FILEIRA.length-1,faz:()=>{FILEIRA.splice(col,1);FILEIRA.splice(col+1,0,k);col++;fechaModal(true)}},
+      {txt:"Tirar da tela inicial",ic:"tira",ok:FILEIRA.length>1,perigo:true,faz:()=>{FILEIRA.splice(col,1);col=Math.min(col,FILEIRA.length-1);fechaModal(true)}},
+      {txt:"Cancelar",ic:"x",ok:true,faz:()=>fechaModal()},
+    ].filter(o=>o.ok);
+    return abreModal(TODOS[k]);
+  }
+  if(modo==="grade"){const k=Object.keys(TODOS)[gi];alvo={k,de:"grade"};const ja=FILEIRA.includes(k);
+    opcoes=[
+      ja?{txt:"Tirar da tela inicial",ic:"tira",perigo:true,faz:()=>{FILEIRA=FILEIRA.filter(x=>x!==k);col=0;fechaModal(true)}}
+        :{txt:"Pôr na tela inicial",ic:"poe",faz:()=>{FILEIRA.push(k);fechaModal(true)}},
+      {txt:"Cancelar",ic:"x",faz:()=>fechaModal()},
+    ];
+    return abreModal(TODOS[k]);
+  }
+}
+function abreModal(a){mi=0;
+  $("modal").innerHTML=`<div class="cab">${capa(a)}<b>${a.nome}</b></div>`+opcoes.map(o=>`<div class="opcao${o.perigo?" perigo":""}">${ICONE[o.ic]}${o.txt}</div>`).join("");
+  [...document.querySelectorAll(".opcao")].forEach((e,i)=>{e.onmouseenter=()=>{mi=i;desenha()};e.onclick=()=>opcoes[i].faz()});
+  modo="modal";$("fundoModal").classList.add("on");desenha()}
+function fechaModal(mudou){$("fundoModal").classList.remove("on");modo=alvo.de;
+  if(mudou){montaInicio();if(modo==="grade")montaGrade()}desenha()}
+function volta(){if(modo==="modal")return fechaModal();if(modo==="grade"){modo="inicio";linha=1;col=2;return desenha()}}
+
+function mexe(k){
+  if(modo==="inicio"){const max=linha===0?FILEIRA.length-1:ATALHOS.length-1;
+    if(k==="ArrowRight"&&col<max)col++;else if(k==="ArrowLeft"&&col>0)col--;
+    else if(k==="ArrowDown"&&linha===0){linha=1;col=Math.min(col,ATALHOS.length-1)}
+    else if(k==="ArrowUp"&&linha===1){linha=0;col=Math.min(col,FILEIRA.length-1)}else return}
+  else if(modo==="grade"){const n=Object.keys(TODOS).length,c=5;
+    if(k==="ArrowRight"&&gi<n-1)gi++;else if(k==="ArrowLeft"&&gi>0)gi--;
+    else if(k==="ArrowDown"&&gi+c<n)gi+=c;else if(k==="ArrowUp"&&gi-c>=0)gi-=c;else return}
+  else if(modo==="modal"){if(k==="ArrowDown"&&mi<opcoes.length-1)mi++;else if(k==="ArrowUp"&&mi>0)mi--;else return}
+  desenha();
+}
+// Enter: soltar rápido = OK; segurar 600 ms = organizar
+let timer=null,segurou=false;
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();if(e.repeat||timer)return;segurou=false;
+    const f=document.querySelector("#fileira .app.foco, #gradeApps .app.foco");if(f&&modo!=="modal")f.classList.add("segurando");
+    timer=setTimeout(()=>{segurou=true;document.querySelectorAll(".segurando").forEach(x=>x.classList.remove("segurando"));segura()},600);return}
+  if(e.key.startsWith("Arrow")){e.preventDefault();mexe(e.key)}
+  if(e.key==="Escape"||e.key==="Backspace"){e.preventDefault();volta()}
+});
+document.addEventListener("keyup",e=>{if(e.key!=="Enter")return;clearTimeout(timer);timer=null;
+  document.querySelectorAll(".segurando").forEach(x=>x.classList.remove("segurando"));if(!segurou)ok()});
+
+const DIAS=["domingo","segunda","terça","quarta","quinta","sexta","sábado"],MES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+function relogio(){const t=new Date();$("h").textContent=t.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});$("d").textContent=`${DIAS[t.getDay()]}, ${t.getDate()} de ${MES[t.getMonth()]}`}
+relogio();setInterval(relogio,10000);
+function encaixa(){const s=Math.min(innerWidth/1920,innerHeight/1080);$("palco").style.transform=`scale(${s})`}
+addEventListener("resize",encaixa);encaixa();
+montaInicio();desenha();
+</script>
+</body>
+</html>

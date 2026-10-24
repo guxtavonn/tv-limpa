@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.TvLimpa" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@drawable/fundo_janela</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:colorBackground">#070707</item>
+        <!-- Sombra do cartão com foco, perto do box-shadow do protótipo (rgba(0,0,0,.85)). -->
+        <item name="android:spotShadowAlpha">0.6</item>
+        <item name="android:ambientShadowAlpha">0.2</item>
+    </style>
+</resources>

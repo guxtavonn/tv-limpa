@@ -1,0 +1,16 @@
+# TCL BeyondTV · Android 9 · firmware V8-R851T02-LF1V625 · grupo 2: apps que ESTA casa não usa
+# Parte da lista completa listas/tcl-beyondtv-lf1v625.txt (lá estão a lista 'Não desligar nunca' e os motivos).
+# Rode um grupo por vez: -Simular, desligar, reiniciar a TV, testar (antena, HDMI, controle, voz, os apps da casa).
+#
+# Esta parte depende de quem usa a TV. Esta casa mantém Netflix, Globoplay, Prime Video, YouTube,
+# Disney+, Chromecast e a busca por voz. Se você usa Telecine, Deezer ou Twitch, TIRE a linha
+# antes de rodar. Adapte à sua casa; o resto da lista é geral.
+br.com.encripta.looke                       # Looke
+br.telecine.androidtv                       # Telecine
+deezer.android.tv                           # Deezer
+tv.twitch.android.app                       # Twitch
+com.facebook.katana                         # Facebook
+eu.bandainamcoent.pacman256                 # Pac-Man
+com.google.android.apps.tachyon             # Google Duo
+com.google.android.music                    # Google Play Música (serviço encerrado)
+com.google.android.play.games               # Google Play Games

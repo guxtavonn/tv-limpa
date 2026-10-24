@@ -1,0 +1,86 @@
+# TCL BeyondTV · Android 9 (API 28) · firmware V8-R851T02-LF1V625 · Realtek RTD2851 · 2 GB de RAM
+#
+# Lista dos apps desligados NESTA TV (feito à mão em 20/10/2026, depois de cada grupo a TV foi
+# testada: antena, HDMI, Chromecast, voz no YouTube, controle Bluetooth e os apps de streaming).
+# Formato: um pacote por linha; tudo depois de "#" é comentário. Cada linha diz por que está aqui.
+#
+# Aplicar:  scripts\desligar-lista.ps1 -Tv <ip-da-tv>:5555 -Lista listas\tcl-beyondtv-lf1v625.txt
+# Desfazer: scripts\religar-lista.ps1  -Tv <ip-da-tv>:5555 -Lista listas\tcl-beyondtv-lf1v625.txt
+# Dica: rode primeiro com -Simular, que só mostra o que seria feito.
+#
+# Desligar aqui é "pm disable-user --user 0": o app continua no aparelho, só deixa de rodar, e dá
+# pra religar a qualquer momento. Nada é apagado, nada de root.
+#
+# ----------------------------------------------------------------------------------------------
+# NÃO DESLIGAR NUNCA (testado neste firmware; está embutido nos scripts, que recusam essas linhas)
+#   com.tcl.tv                            a TV aberta (antena)
+#   com.tcl.tvinput                       sintonizador
+#   com.tcl.tvpassthrough                 entradas HDMI
+#   com.tcl.sourcemananger                menu de entradas da TCL
+#   com.tcl.keycustomfunctionservice      botões do controle (e tela de emergência)
+#   com.tcl.framework.custom              base dos apps da TCL
+#   com.tcl.tcl_bt_rcu_service            controle Bluetooth
+#   com.tcl.autopair                      pareamento do controle
+#   com.google.android.tv.remote.service  controle pelo celular
+#   com.tcl.inputmethod.international     teclado
+#   com.tcl.settings                      configurações da TCL
+#   com.tcl.initsetup                     configuração inicial
+#   com.tcl.factory.view                  modo de fábrica
+#   com.tcl.showmode                      modo loja
+#   com.tcl.xian.StartandroidService      serviço de arranque
+#   com.tcl.appstatecontroller            o que religa os apps no boot (veja o aviso do grupo 3)
+#   com.realtek.netflix.setting           ajuste do Netflix no chip Realtek
+#   com.android.WifiCountryService        país do Wi-Fi
+#   A VOZ: com.google.android.katniss, com.google.android.speech.pumpkin, com.tcl.assistant,
+#          com.tcl.micmanager. Fica porque o YouTube usa o katniss como o reconhecimento de voz
+#          do sistema (voice_recognition_service). Desligar isso quebra a busca por voz.
+# ----------------------------------------------------------------------------------------------
+#
+# ================================================================================================
+# GRUPO 1 · rastreamento e propaganda
+# Seguro nas listas do cleanyourtv para as TVs RTD2851 (Europa e América Latina); aqui foi testado.
+# ================================================================================================
+com.tcl.bi                                  # rastreamento da TCL (analytics)
+com.google.android.feedback                 # enviar feedback
+com.google.android.tv.bugreportsender       # envio de relatório de erro
+com.google.android.partnersetup             # atribuição de app de parceiro
+com.google.android.onetimeinitializer       # sobra da configuração inicial
+android.autoinstalls.config.tcl.device      # instala app de parceiro sozinho
+com.tcl.tv.tclhome_passive                  # empurra conteúdo da TCL pra tela inicial no boot
+com.tcl.messagebox                          # caixa de mensagens/promo da TCL
+com.google.android.tvrecommendations        # fileiras de recomendação da tela inicial
+com.google.android.leanbacklauncher.recommendations   # recomendações da tela inicial antiga
+com.google.android.videos                   # Google Play Filmes
+com.tcl.android.webview                     # webview da TCL sem uso (a do Google é a ativa)
+#
+# ================================================================================================
+# GRUPO 2 · apps que ESTA casa não usa
+# Esta parte depende de quem usa a TV. Esta casa mantém Netflix, Globoplay, Prime Video, YouTube,
+# Disney+, Chromecast e a busca por voz. Se você usa Telecine, Deezer ou Twitch, TIRE a linha
+# antes de rodar. Adapte à sua casa; o resto da lista é geral.
+# ================================================================================================
+br.com.encripta.looke                       # Looke
+br.telecine.androidtv                       # Telecine
+deezer.android.tv                           # Deezer
+tv.twitch.android.app                       # Twitch
+com.facebook.katana                         # Facebook
+eu.bandainamcoent.pacman256                 # Pac-Man
+com.google.android.apps.tachyon             # Google Duo
+com.google.android.music                    # Google Play Música (serviço encerrado)
+com.google.android.play.games               # Google Play Games
+#
+# ================================================================================================
+# GRUPO 3 · os teimosos
+# AVISO: o com.tcl.appstatecontroller (app de sistema, com a permissão INSTALL_PACKAGES) desfaz
+# o que o adb faz com estes 4: "pm uninstall -k --user 0" e "pm disable-user" voltam sozinhos
+# a cada boot. E o adb de um aparelho comum não consegue desligar o BootReceiver dele
+# (dá SecurityException). Por isso as linhas abaixo só valem até a TV reiniciar.
+# O que ajuda é a faxina do app da tela inicial deste projeto, que pede pra fechar esses 4
+# no boot, 60 s depois e toda vez que a tela volta. Na TV testada, 2 ficaram fechados e a TCL
+# manteve a Alexa e o MagiConnect rodando (o Android não deixa um app comum fechar esses dois).
+# Sem o app, o jeito é aceitar que eles voltam.
+# ================================================================================================
+com.tcl.smartalexa                          # Alexa da TCL
+com.tcl.MultiScreenInteraction_TV           # MagiConnect / T-Cast (o Chromecast fica)
+com.tcl.notereminder                        # lembretes da TCL
+com.tcl.tv.tclhome_master                   # TCL Channel (não testado nas listas de referência)

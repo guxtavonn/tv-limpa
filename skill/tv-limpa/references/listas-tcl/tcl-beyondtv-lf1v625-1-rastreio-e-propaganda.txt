@@ -1,0 +1,17 @@
+# TCL BeyondTV · Android 9 · firmware V8-R851T02-LF1V625 · grupo 1: rastreamento e propaganda
+# Parte da lista completa listas/tcl-beyondtv-lf1v625.txt (lá estão a lista 'Não desligar nunca' e os motivos).
+# Rode um grupo por vez: -Simular, desligar, reiniciar a TV, testar (antena, HDMI, controle, voz, os apps da casa).
+#
+# Seguro nas listas do cleanyourtv para as TVs RTD2851 (Europa e América Latina); aqui foi testado.
+com.tcl.bi                                  # rastreamento da TCL (analytics)
+com.google.android.feedback                 # enviar feedback
+com.google.android.tv.bugreportsender       # envio de relatório de erro
+com.google.android.partnersetup             # atribuição de app de parceiro
+com.google.android.onetimeinitializer       # sobra da configuração inicial
+android.autoinstalls.config.tcl.device      # instala app de parceiro sozinho
+com.tcl.tv.tclhome_passive                  # empurra conteúdo da TCL pra tela inicial no boot
+com.tcl.messagebox                          # caixa de mensagens/promo da TCL
+com.google.android.tvrecommendations        # fileiras de recomendação da tela inicial
+com.google.android.leanbacklauncher.recommendations   # recomendações da tela inicial antiga
+com.google.android.videos                   # Google Play Filmes
+com.tcl.android.webview                     # webview da TCL sem uso (a do Google é a ativa)
